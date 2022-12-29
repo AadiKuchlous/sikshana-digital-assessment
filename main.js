@@ -9,8 +9,9 @@ function createForm(questions) {
 
   for (let i = 0; i < questions.length; i++) {
     let this_q = questions[i];
-    let title = document.createElement("p")
-    title.textContent = this_q["Question"]
+    let q_number = this_q["Question no."];
+    let title = document.createElement("p");
+    title.textContent = this_q["Question"];
     form.appendChild(title);
 
     let options = ["Op. A", "Op. B", "Op. C", "Op. D"]
@@ -23,10 +24,11 @@ function createForm(questions) {
         let input = document.createElement("input");
         let label = document.createElement("label");
 
-        let id = this_q["Question no."].toString + option;
+        let id = q_number.toString + option;
 
         input.type = "radio";
         input.value = option_title;
+        input.name = q_number.toString();
         input.id = id;
 
         label.textContent = option_title;
