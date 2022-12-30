@@ -2,6 +2,11 @@ var question_data = [];
 var headers = [];
 
 
+function getS3Url(params) {
+  return ("https://"+params.Bucket+".s3.ap-south-1.amazonaws.com/"+params.Key);
+}
+
+
 function createForm(questions) {
   console.log(questions);
 
@@ -11,7 +16,7 @@ function createForm(questions) {
     let this_q = questions[i];
     let q_number = this_q["Question no."];
     let title = document.createElement("p");
-    title.textContent = this_q["Question"];
+    title.textContent = (i+1).toString() + ". " + this_q["Question"];
     form.appendChild(title);
 
     let options = ["Op. A", "Op. B", "Op. C", "Op. D"]
@@ -24,7 +29,7 @@ function createForm(questions) {
         let input = document.createElement("input");
         let label = document.createElement("label");
 
-        let id = q_number.toString + option;
+        let id = q_number.toString() + option;
 
         input.type = "radio";
         input.value = option_title;
@@ -88,29 +93,10 @@ function downloadFromSource(url, callback) {
 }
 
 
-// Code for getting file from AWS S3 bucket (change credentials and params where required)
-// Replace with other API dependent of file location
+// Code for getting file from AWS S3 bucket (change params when required)
+// Replace with other url generator depending on storage location
 // Remember to call downloadFromSource with valid URL
-AWS.config.update({
-  accessKeyId: "AKIA5TOZ3QKAM6IW3BMK",
-  secretAccessKey: "aZNygdSDcsKeeHHDQkF3vTuez7IHb0/weD/TbvVW",
-  "region": "ap-south-1"
-});
-
-let s3 = new AWS.S3();
 
 let params = {Bucket: "sikshana-digital-assessments", Key: "Digital Assessment - for app.xlsx"};
-s3.getSignedUrl('getObject', params, function(err, url){
-  downloadFromSource(url, parseS3Response);
-});
-// End AWS code
-
-
-/*
-document.addEventListener('DOMContentLoaded', function() {
-  var input = document.getElementById('input')
-  input.addEventListener('change', function() {
-    readExcelSheet(input.files[0])
-  })
-})
-*/
+let url = getS3Url(params);
+downloadFromSource(url, parseS3Response);
