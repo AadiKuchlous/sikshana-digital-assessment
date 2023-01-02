@@ -18,14 +18,20 @@ function getS3Url(params) {
 function formSubmitted(e) {
   e.preventDefault();
 
-  removeElementsByClass("feedback");
+//  removeElementsByClass("feedback");
+
+  document.getElementById("quiz-container").style.display = "none";
+  document.getElementById("results").style.display = "block";
 
   const form = new FormData(e.target);
   let questions = JSON.parse(sessionStorage.getItem("questions"));
+
+  let answers = {}
+
   for (question of questions) {
     let question_number = question["Question no."];
-
-    let ans_key = question["Ans. Key"]
+    let category = question["Category"];
+    let ans_key = question["Ans. Key"];
 
     let correct_ans = false;
 
@@ -37,23 +43,72 @@ function formSubmitted(e) {
       }
     }
 
-    let feedback_div = document.createElement("div");
-    feedback_div.classList.add("feedback");
-
-    if (correct_ans) {
-      feedback_div.textContent = "Answer is Correct";
-    }
-    else {
-      let ex = "No answer given";
+    let ex = "";
+    if (!correct_ans) {
+      ex = "No answer given";
       if (response) {
         ex = question["Ex. "+response]
       }
-      feedback_div.textContent = "Answer is Incorrect. " + ex;
     }
 
-    let question_div = document.getElementById(question_number)
-    question_div.appendChild(feedback_div);
+    if (!answers[category]) {
+      answers[category] = [];
+    }
 
+    answers[category].push(
+      {
+        "question": question["Question"],
+        "my_ans": response,
+        "correct_ans": ans_key,
+        "explanation": ex
+      }
+    )
+  }
+
+  let table = document.getElementById("results-table");
+
+  for (category in answers) {
+    let cat_header_row = document.createElement("tr");
+    let header_cell = document.createElement("th");
+    header_cell.classList.add("category-header");
+    header_cell.textContent = category;
+    header_cell.colSpan = "5";
+    cat_header_row.appendChild(header_cell);
+    table.appendChild(cat_header_row);
+
+    let cat_questions = answers[category];
+    for (question of cat_questions) {
+      let row = document.createElement("tr");
+      let q_cell = document.createElement("td");
+      let ans_cell = document.createElement("td");
+      let img_cell = document.createElement("td");
+      let ans_key_cell = document.createElement("td");
+      let ex_cell = document.createElement("td");
+
+      q_cell.textContent = question.question;
+      ans_cell.textContent = question.my_ans;
+      ans_key_cell.textContent = question.correct_ans;
+      ex_cell.textContent = question.explanation;
+
+      if (question.my_ans == question.correct_ans) {
+        img_cell.textContent = "✓";
+      }
+      else {
+        img_cell.textContent = "×";
+      }
+      img_cell.style.fontSize = "x-large";
+
+      q_cell.classList.add("left-align");
+      ex_cell.classList.add("left-align");
+
+      row.appendChild(q_cell);
+      row.appendChild(ans_cell);
+      row.appendChild(img_cell);
+      row.appendChild(ans_key_cell);
+      row.appendChild(ex_cell);
+
+      table.appendChild(row);
+    }
   }
 }
 
@@ -69,7 +124,10 @@ function createForm(questions) {
     let q_number = this_q["Question no."];
 
     let container = document.createElement("div");
-    container.id = q_number;
+    container.id = i+1;
+    container.classList.add("question_contianer");
+    container.style.display = "none";
+
 
     let title = document.createElement("p");
     title.textContent = (i+1).toString() + ". " + this_q["Question"];
@@ -96,6 +154,7 @@ function createForm(questions) {
         label.for = id;
 
         let span = document.createElement("span");
+        option_title = option.charAt(option.length-1) + ". " + option_title;
         span.textContent = option_title;
 
         // options_div.appendChild(input);
@@ -146,8 +205,10 @@ function generateRandomQs(data) {
     while (q_indices.length < 3) {
       let index = Math.floor(Math.random() * num_questions);
       if (!q_indices.includes(index)) {
-        Qs.push(cat_questions[index]);
-        q_indices.push(index);
+        if (cat_questions[index]["Ans. Key"]) {
+          Qs.push(cat_questions[index]);
+          q_indices.push(index);
+        }
       }
     }
 
@@ -157,6 +218,8 @@ function generateRandomQs(data) {
     }
 */
   }
+
+  document.getElementById("total-question").textContent = Qs.length.toString();
 
   return(Qs)
 }
@@ -212,14 +275,103 @@ function downloadFromSource(url, callback) {
 }
 
 
+function showStartPage() {
+  document.getElementById('quiz-container').style.display = "flex";
+  document.getElementById('main-page').style.display = "flex";
+  document.getElementById('form').style.display = "none";
+
+  document.getElementById('results').style.display = "none";
+}
+
+function hideStartPage() {
+  document.getElementById('main-page').style.display = "none";
+}
+
+
+function showQuestion(q_no) {
+  hideStartPage();
+
+  document.getElementById('form').style.display = "block";
+
+  let question_divs = document.getElementById('form-questions').children;
+  for (let i = 0; i < question_divs.length; i++) {
+    let question_div = question_divs[i];
+    let this_q_no = parseInt(question_div.id);
+    if (this_q_no == q_no) {
+      question_div.style.display = "block";
+    }
+    else {
+      question_div.style.display = "none";
+    }
+  }
+
+  document.getElementById("current-question").textContent = q_no.toString();
+}
+
+
+function start() {
+  document.getElementById('form').style.display = "block";
+  hideStartPage();
+
+  sessionStorage.setItem('q_no', '0');
+  nextQuestion();
+}
+
+
+function nextQuestion() {
+  let current_q = parseInt(sessionStorage.getItem('q_no'))+1;
+
+  sessionStorage.setItem('q_no', current_q.toString())
+  showQuestion(current_q);
+	
+  let questions = JSON.parse(sessionStorage.getItem('questions'));
+  let total_questions = questions.length;
+  if (current_q == total_questions) {
+    document.getElementById('next-question').style.display = "none";
+    document.getElementById('submit').style.display = "block";
+  }
+  else {
+    document.getElementById('next-question').style.display = "block";
+    document.getElementById('submit').style.display = "none";
+  }
+}
+
+function prevQuestion() {
+  let current_q = parseInt(sessionStorage.getItem('q_no'));
+
+  if (current_q == 1) {
+    showStartPage();
+  }
+  else {
+    current_q -= 1;
+    sessionStorage.setItem('q_no', current_q.toString())
+    showQuestion(current_q);
+  }
+}
+
+
+function retake() {
+  showStartPage();
+  document.getElementById("form").reset();
+}
+
+
+
 // Code for getting file from AWS S3 bucket (change params when required)
 // Replace with other url generator depending on storage location
 // Remember to call downloadFromSource with valid URL
 
 let params = {Bucket: "sikshana-digital-assessments", Key: "Digital Assessment - for app.csv"};
 let url = getS3Url(params);
-downloadFromSource(url, parseS3Response);
+ downloadFromSource(url, parseS3Response);
 
 document.addEventListener("DOMContentLoaded", function(){
+  document.getElementById('start').onclick = start;
   document.getElementById('form').onsubmit = formSubmitted;
+
+  document.getElementById('next-question').onclick = nextQuestion;
+  document.getElementById('prev-question').onclick = prevQuestion;
+
+  document.getElementById('retake').onclick = retake;
+  document.getElementById('download').onclick = downloadPDF;
 })

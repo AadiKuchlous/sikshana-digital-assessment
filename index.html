@@ -10,19 +10,71 @@
 <script src="csvToArray.v2.1.js"></script>
 
 
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
 <script src="main.js"></script>
+<script src="certificate.js"></script>
+
+<link href="main.css" rel="stylesheet" type="text/css">
+<link href="table.css" rel="stylesheet" type="text/css">
 
 </head>
 
 <body>
 
-<h1>Digital Assessment</h1>
+<div style="display: none" id="certificate">
+<h1>Testing the certificate pdf generator</h1>
+</div>
 
-<form id="form">
+
+<div id="quiz-container">
+
+<div id="main-page">
+
+<h1>Digital Assessment</h1>
+<h2>Level 3</h2>
+
+<input type="text" placeholder="Enter Name:" id="name"></input>
+<button id="start">Start Quiz</button>
+
+</div>
+
+<form id="form" style="display: none">
+
 <div id="form-questions">
 </div>
-<input type="submit" value="Submit" />
+
+<div class="footer" id="footer" style="display: flex; flex-direction: row;">
+
+<button type="button" id="prev-question">&lt Previous</button>
+
+<div id="question-number">
+<span id="current-question">0</span>/<span id="total-question">0</span>
+</div>
+
+<button type="button" id="next-question">Next Question &gt</button>
+<input type="submit" id="submit" value="Submit" style="display: none"/>
+
+</div>
 </form>
+
+</div>
+
+<div id="results" style="display:none">
+<table id="results-table">
+  <tr>
+    <th></th>
+    <th>Your Answer</th>
+    <th></th>
+    <th>Correct Answer</th>
+    <th>Explanation</th>
+  </tr>
+</table>
+<div class="footer">
+<button id="retake">Retake Quiz</button>
+<button id="download">Download Certificate</button>
+</div>
+</div>
 
 </body>
 </html>
