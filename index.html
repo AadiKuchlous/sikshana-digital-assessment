@@ -5,33 +5,31 @@
 
 <head>
 
-<title>Digital Skills Assessment</title>
+<title>Page Title</title>
+
 
 <script src="csvToArray.v2.1.js"></script>
 
 
+<script src="html2canvas.min.js"></script>
 <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 
 <script src="main.js"></script>
 <script src="certificate.js"></script>
 
 <link href="main.css" rel="stylesheet" type="text/css">
+<link href="modal.css" rel="stylesheet" type="text/css">
 <link href="table.css" rel="stylesheet" type="text/css">
 
 </head>
 
 <body>
 
-<div style="display: none" id="certificate">
-<h1>Testing the certificate pdf generator</h1>
-</div>
-
-
 <div id="quiz-container">
 
 <div id="main-page">
 
-<h1>Digital Skills Assessment</h1>
+<h1>Digital Assessment</h1>
 <h2>Level 3</h2>
 
 <input type="text" placeholder="Enter Name:" id="name"></input>
@@ -74,6 +72,17 @@
 <button id="retake">Retake Quiz</button>
 <button id="download">Download Certificate</button>
 </div>
+</div>
+
+<div id="cert_modal" class="modal">
+
+  <div class="modal-content">
+    <span class="modal_close">&times;</span>
+    <div style="display:flex; width: 100%; height: 100%; align-items:center; justify-content:center">
+    <iframe id="cert_iframe" width="720px" height="600px"></iframe>
+    </div>
+  </div>
+
 </div>
 
 </body>

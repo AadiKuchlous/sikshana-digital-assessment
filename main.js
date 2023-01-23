@@ -15,6 +15,12 @@ function getS3Url(params) {
 }
 
 
+function getDriveUrl(link) {
+  let id = link.split("/d/")[1].split("/view?")[0];
+  return "https://drive.google.com/uc?export=view&id="+id;
+}
+
+
 function formSubmitted(e) {
   e.preventDefault();
 
@@ -67,6 +73,8 @@ function formSubmitted(e) {
 
   let table = document.getElementById("results-table");
 
+  let correct_total = 0;
+
   for (category in answers) {
     let cat_header_row = document.createElement("tr");
     let header_cell = document.createElement("th");
@@ -92,6 +100,7 @@ function formSubmitted(e) {
 
       if (question.my_ans == question.correct_ans) {
         img_cell.textContent = "✓";
+        correct_total += 1;
       }
       else {
         img_cell.textContent = "×";
@@ -110,6 +119,8 @@ function formSubmitted(e) {
       table.appendChild(row);
     }
   }
+
+  sessionStorage.setItem('score', correct_total);
 }
 
 
@@ -129,9 +140,21 @@ function createForm(questions) {
     container.style.display = "none";
 
 
+    let title_area = document.createElement("div");
+    title_area.classList.add("title_container");
     let title = document.createElement("p");
     title.textContent = (i+1).toString() + ". " + this_q["Question"];
-    container.appendChild(title);
+    title_area.appendChild(title);
+
+    let question_img = this_q["Image link"];
+    if (question_img) {
+      let image = document.createElement("img");
+      image.classList.add("question_image");
+      image.src = getDriveUrl(question_img);
+      title_area.appendChild(image);
+    }
+
+    container.appendChild(title_area);
 
     let options = ["Op. A", "Op. B", "Op. C", "Op. D"]
 
@@ -154,12 +177,22 @@ function createForm(questions) {
         label.for = id;
 
         let span = document.createElement("span");
-        option_title = option.charAt(option.length-1) + ". " + option_title;
-        span.textContent = option_title;
+        let img;
+        if (option_title.includes("drive.google.com")) {
+          img = document.createElement('img')
+          img.src = getDriveUrl(option_title);
+        }
+        else {
+          option_title = option.charAt(option.length-1) + ". " + option_title;
+          span.textContent = option_title;
+        }
 
         // options_div.appendChild(input);
         label.appendChild(input);
         label.appendChild(span);
+        if (img) {
+          label.appendChild(img);
+        }
         options_div.appendChild(label);
       }
 
@@ -197,11 +230,12 @@ function fillQuestionData(questions) {
 
 function generateRandomQs(data) {
   let Qs = [];
+
   for (category in data) {
     let cat_questions = data[category].slice();
     let num_questions = cat_questions.length;
     let q_indices = [];
-
+/*
     while (q_indices.length < 3) {
       let index = Math.floor(Math.random() * num_questions);
       if (!q_indices.includes(index)) {
@@ -212,11 +246,11 @@ function generateRandomQs(data) {
       }
     }
 
-/*
+*/
     for (x of cat_questions) {
       Qs.push(x);
     }
-*/
+
   }
 
   document.getElementById("total-question").textContent = Qs.length.toString();
@@ -245,6 +279,7 @@ function readCSV(file) {
 
   file.text().then(function(data) {
     let parsed = data.csvToArray()
+    console.log(parsed);
 
     fillQuestionData(parsed);
     let questions = generateRandomQs(question_data);
@@ -338,6 +373,9 @@ function nextQuestion() {
 
 function prevQuestion() {
   let current_q = parseInt(sessionStorage.getItem('q_no'));
+
+  document.getElementById('next-question').style.display = "block";
+  document.getElementById('submit').style.display = "none";
 
   if (current_q == 1) {
     showStartPage();
