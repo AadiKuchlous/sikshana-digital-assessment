@@ -235,7 +235,7 @@ function generateRandomQs(data) {
     let cat_questions = data[category].slice();
     let num_questions = cat_questions.length;
     let q_indices = [];
-/*
+
     while (q_indices.length < 3) {
       let index = Math.floor(Math.random() * num_questions);
       if (!q_indices.includes(index)) {
@@ -246,11 +246,11 @@ function generateRandomQs(data) {
       }
     }
 
-*/
+/*
     for (x of cat_questions) {
       Qs.push(x);
     }
-
+*/
   }
 
   document.getElementById("total-question").textContent = Qs.length.toString();
@@ -274,37 +274,41 @@ function readExcelSheet(file) {
   })
 }
 
+function setQuestions(csv_data) {
+  let parsed = csv_data.csvToArray()
 
-function readCSV(file) {
+  fillQuestionData(parsed);
+  let questions = generateRandomQs(question_data);
+
+  sessionStorage.setItem("questions", JSON.stringify(questions));
+
+  createForm(questions);
+
+}
+
+
+function readCSV(file, callback) {
 
   file.text().then(function(data) {
-    let parsed = data.csvToArray()
-    console.log(parsed);
-
-    fillQuestionData(parsed);
-    let questions = generateRandomQs(question_data);
-
-    sessionStorage.setItem("questions", JSON.stringify(questions));
-
-    createForm(questions);
+    callback(data);
   })
 }
 
 
-async function parseS3Response(response) {
+async function parseS3Response(response, callback) {
   let file = await response.blob();
   // readExcelSheet(file);
-  readCSV(file);
+  readCSV(file, callback);
 }
 
 
-function downloadFromSource(url, callback) {
+function downloadFromSource(url, callback, second_callback) {
   fetch(url).then(response => {
     if (!response.ok) {
       throw new Error("HTTP error " + response.status); // Rejects the promise
     }
     else {
-      callback(response);
+      callback(response, second_callback);
     }
   });
 }
@@ -401,9 +405,11 @@ function retake() {
 
 let params = {Bucket: "sikshana-digital-assessments", Key: "Digital Assessment - for app.csv"};
 let url = getS3Url(params);
- downloadFromSource(url, parseS3Response);
+downloadFromSource(url, parseS3Response, setQuestions);
 
 document.addEventListener("DOMContentLoaded", function(){
+  start_fill_all();
+
   document.getElementById('start').onclick = start;
   document.getElementById('form').onsubmit = formSubmitted;
 
@@ -412,4 +418,8 @@ document.addEventListener("DOMContentLoaded", function(){
 
   document.getElementById('retake').onclick = retake;
   document.getElementById('download').onclick = downloadPDF;
+
+  document.getElementById('brc').onchange = narrowByBRC;
+  document.getElementById('crc').onchange = narrowByCRC;
+  document.getElementById('school').onchange = narrowBySchool;
 })

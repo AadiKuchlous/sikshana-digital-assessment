@@ -12,13 +12,25 @@ async function generatePDF(base64_string) {
   doc.addImage(base64_string, 'JPEG', 0, 0, 720, 556)
 
   let name = document.getElementById("name").value;
-  doc.setFontSize(70)
-  doc.text(270, 250, name)
+  doc.setFontSize(40)
+  doc.text(230, 210, name)
+
+  let grade = document.getElementById("grade").value;
+  doc.setFontSize(30)
+  doc.text(300, 270, grade)
+
+  let school = "GOVT- URDU BOYS LOWER PRIMARY SCHOOL GADDANAKERI";
+  doc.setFontSize(13)
+  doc.text(360, 270, school)
+
+  let village = "BAGALKOT";
+  doc.setFontSize(20)
+  doc.text(240, 320, village)
 
   let date = new Date().toLocaleDateString().padStart(10, '0');
   doc.setFontSize(20)
   doc.setTextColor(0.6)
-  doc.text(360, 336, date)
+  doc.text(300, 430, date)
 
 //  doc.save('cert.pdf');
 
@@ -33,11 +45,19 @@ async function generatePDF(base64_string) {
 
 
 async function downloadPDF() {
+/*
   let urls = 
     [
       getS3Url({Bucket: "sikshana-digital-assessments", Key: "Sample_cert_1.jpeg"}),
       getS3Url({Bucket: "sikshana-digital-assessments", Key: "Sample_cert_2.jpeg"}),
       getS3Url({Bucket: "sikshana-digital-assessments", Key: "Sample_cert_3.jpeg"}),
+    ];
+*/
+  let urls = 
+    [
+      getS3Url({Bucket: "sikshana-digital-assessments", Key: "certificate_test.jpg"}),
+      getS3Url({Bucket: "sikshana-digital-assessments", Key: "certificate_test.jpg"}),
+      getS3Url({Bucket: "sikshana-digital-assessments", Key: "certificate_test.jpg"}),
     ];
 
   score = parseInt(sessionStorage.getItem('score'));

@@ -23,6 +23,10 @@ button:hover {
   cursor: pointer;
 }
 
+#submit {
+  background-color: green;
+}
+
 
 #quiz-container {
   padding: 3vw;
