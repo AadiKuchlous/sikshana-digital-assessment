@@ -403,7 +403,7 @@ function retake() {
 // Replace with other url generator depending on storage location
 // Remember to call downloadFromSource with valid URL
 
-let params = {Bucket: "sikshana-digital-assessments", Key: "Digital Assessment - for app.csv"};
+let params = {Bucket: "sikshana-digital-assessments", Key: "Digital Assessment - for app - with Kannada.csv"};
 let url = getS3Url(params);
 downloadFromSource(url, parseS3Response, setQuestions);
 
