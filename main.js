@@ -219,6 +219,10 @@ function fillQuestionData(questions) {
 
     let category = question_obj.Category.trim();
 
+    if (category == "") {
+      continue;
+    }
+
     if (!question_data[category]) {
       question_data[category] = [];
     }
@@ -232,6 +236,7 @@ function generateRandomQs(data) {
   let Qs = [];
 
   for (category in data) {
+    console.log(category);
     let cat_questions = data[category].slice();
     let num_questions = cat_questions.length;
     let q_indices = [];
@@ -239,6 +244,7 @@ function generateRandomQs(data) {
     while (q_indices.length < 3) {
       let index = Math.floor(Math.random() * num_questions);
       if (!q_indices.includes(index)) {
+        console.log(index);
         if (cat_questions[index]["Ans. Key"]) {
           Qs.push(cat_questions[index]);
           q_indices.push(index);
@@ -275,10 +281,17 @@ function readExcelSheet(file) {
 }
 
 function setQuestions(csv_data) {
+  console.log("Setting Questions");
+
   let parsed = csv_data.csvToArray()
 
+  console.log(parsed);
+
   fillQuestionData(parsed);
+  console.log("Filled Question Data");
   let questions = generateRandomQs(question_data);
+
+  console.log(questions)
 
   sessionStorage.setItem("questions", JSON.stringify(questions));
 
@@ -297,7 +310,6 @@ function readCSV(file, callback) {
 
 async function parseS3Response(response, callback) {
   let file = await response.blob();
-  // readExcelSheet(file);
   readCSV(file, callback);
 }
 
@@ -397,6 +409,22 @@ function retake() {
   document.getElementById("form").reset();
 }
 
+function noNameAlert() {
+  alert("Please enter your name to start")
+}
+
+
+function nameChange(e) {
+  let value = e.target.value;
+
+  if (value == "") {
+    document.getElementById('start').onclick = noNameAlert;
+  }
+  else {
+    document.getElementById('start').onclick = start;
+  }
+}
+
 
 
 // Code for getting file from AWS S3 bucket (change params when required)
@@ -410,7 +438,7 @@ downloadFromSource(url, parseS3Response, setQuestions);
 document.addEventListener("DOMContentLoaded", function(){
   start_fill_all();
 
-  document.getElementById('start').onclick = start;
+  document.getElementById('start').onclick = noNameAlert;
   document.getElementById('form').onsubmit = formSubmitted;
 
   document.getElementById('next-question').onclick = nextQuestion;
@@ -418,6 +446,8 @@ document.addEventListener("DOMContentLoaded", function(){
 
   document.getElementById('retake').onclick = retake;
   document.getElementById('download').onclick = downloadPDF;
+
+  document.getElementById('name').onchange = nameChange;
 
   document.getElementById('brc').onchange = narrowByBRC;
   document.getElementById('crc').onchange = narrowByCRC;
