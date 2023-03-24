@@ -82,13 +82,26 @@ button:hover {
 
 label {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   margin-bottom: 1.2em;
+  font-size: 1rem;
+}
+
+label span {
   font-size: 1rem;
 }
 
 label img {
   height: 5em;
+}
+
+label img + input {
+  align-self: flex-start;
+}
+
+input[type="radio"] {
+  height: 1rem;
+  width: 1rem;
 }
 
 .title_container {
