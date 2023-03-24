@@ -28,7 +28,7 @@
 String.prototype.csvToArray = function (o) {
     var od = {
         'fSep': ',',
-        'rSep': '\r\n',
+        'rSep': '\n',
         'quot': '"',
         'head': false,
         'trim': true
