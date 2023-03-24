@@ -27,8 +27,15 @@ async function generatePDF(base64_string) {
   let data = doc.output("datauristring");
   console.log(data);
 
+  if(window.matchMedia("(pointer: coarse)").matches) {
+    // touchscreen
+    doc.save(`certificate-${name}.pdf`);
+  }
+
+  let zoom = 100*0.65*window.innerWidth/(1000*2);
+
   document.getElementById("cert_modal").style.display = "block";
-  document.getElementById("cert_iframe").src = data+"#zoom=50";
+  document.getElementById("cert_iframe").src = data+`#zoom=${zoom}`;
 
   document.getElementsByClassName("modal_close")[0].onclick = function() {document.getElementById("cert_modal").style.display = "none";}
 }
