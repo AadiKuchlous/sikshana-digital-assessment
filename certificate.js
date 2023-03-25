@@ -31,13 +31,15 @@ async function generatePDF(base64_string) {
     // touchscreen
     doc.save(`certificate-${name}.pdf`);
   }
+  else {
 
-  let zoom = 100*0.65*window.innerWidth/(1000*2);
+    let zoom = 100*0.65*window.innerWidth/(1000*2);
 
-  document.getElementById("cert_modal").style.display = "block";
-  document.getElementById("cert_iframe").src = data+`#zoom=${zoom}`;
+    document.getElementById("cert_modal").style.display = "block";
+    document.getElementById("cert_iframe").src = data+`#zoom=${zoom}`;
 
-  document.getElementsByClassName("modal_close")[0].onclick = function() {document.getElementById("cert_modal").style.display = "none";}
+    document.getElementsByClassName("modal_close")[0].onclick = function() {document.getElementById("cert_modal").style.display = "none";}
+  }
 }
 
 
