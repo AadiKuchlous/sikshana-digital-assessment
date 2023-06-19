@@ -73,10 +73,15 @@ function formSubmitted(e) {
 
   let table = document.getElementById("results-table");
 
+  // Clear Table
+
+  table.querySelectorAll(".report").forEach(el => el.remove());
+
   let correct_total = 0;
 
   for (category in answers) {
     let cat_header_row = document.createElement("tr");
+    cat_header_row.classList.add("report");
     let header_cell = document.createElement("th");
     header_cell.classList.add("category-header");
     header_cell.textContent = category;
@@ -87,6 +92,9 @@ function formSubmitted(e) {
     let cat_questions = answers[category];
     for (question of cat_questions) {
       let row = document.createElement("tr");
+
+      row.classList.add("report");
+
       let q_cell = document.createElement("td");
       let ans_cell = document.createElement("td");
       let img_cell = document.createElement("td");
